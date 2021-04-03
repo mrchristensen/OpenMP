@@ -1,5 +1,8 @@
-// Number of cores: 4
+/*
+  Number of cores: 4
 
+  Times:
+    Before parallelization: 42.015119s
 /*
   This program is an adaptation of the Mandelbrot program
   from the Programming Rosetta Stone, see
@@ -38,6 +41,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 
 int main(int argc, char *argv[])
 {
@@ -48,6 +52,9 @@ int main(int argc, char *argv[])
     printf("Example: %s 0.27085 0.27100 0.004640 0.004810 1000 1024 pic.ppm\n", argv[0]);
     exit(EXIT_FAILURE);
   }
+
+   clock_t start, end;
+   double cpu_time_used;
 
   /* The window in the plane. */
   const double xmin = atof(argv[1]);
@@ -86,9 +93,9 @@ int main(int argc, char *argv[])
   unsigned char *buffer;
   buffer = (char *)malloc(xres * yres * 6 * sizeof(unsigned char));
   // buffer[xres][yres] = malloc(6);
-  printf("buffer size: %ld\n", sizeof(buffer));
-  int index = 0;
-
+  
+  printf("Start time\n");
+  start = clock();
   for (j = 0; j < yres; j++)
   {
     y = ymax - j * dy;
@@ -129,7 +136,11 @@ int main(int argc, char *argv[])
     }
   }
 
-  printf("buffer size: %ld\n", sizeof(buffer));
+  end = clock();
+  printf("End time\n");
+
+  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+  printf("Time: %f\n", cpu_time_used);
   fwrite(buffer, sizeof(char), xres * yres * 6 * sizeof(unsigned char), fp);
   fclose(fp);
   free(buffer);
