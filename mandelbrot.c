@@ -2,7 +2,13 @@
   Number of cores: 4
 
   Times:
-    Before parallelization: 42.015119s
+    Before parallelization: 47.934654s
+    Threads 1 - 42.479030s
+    Threads 2 - 22.676557s
+    Threads 4 - 12.942305s
+    Threads 8 - 11.707334s
+*/
+
 /*
   This program is an adaptation of the Mandelbrot program
   from the Programming Rosetta Stone, see
@@ -42,6 +48,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <omp.h>
 
 int main(int argc, char *argv[])
 {
@@ -53,8 +60,7 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-   clock_t start, end;
-   double cpu_time_used;
+   double start, end;
 
   /* The window in the plane. */
   const double xmin = atof(argv[1]);
@@ -95,7 +101,10 @@ int main(int argc, char *argv[])
   // buffer[xres][yres] = malloc(6);
   
   printf("Start time\n");
-  start = clock();
+  start = omp_get_wtime();
+
+  omp_set_num_threads(4);
+  #pragma omp parallel for shared(buffer) firstprivate(i) private(x, y, j, k)
   for (j = 0; j < yres; j++)
   {
     y = ymax - j * dy;
@@ -136,11 +145,9 @@ int main(int argc, char *argv[])
     }
   }
 
-  end = clock();
-  printf("End time\n");
+  end = omp_get_wtime();
+  printf("End time : %f\n", end - start);
 
-  cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-  printf("Time: %f\n", cpu_time_used);
   fwrite(buffer, sizeof(char), xres * yres * 6 * sizeof(unsigned char), fp);
   fclose(fp);
   free(buffer);
