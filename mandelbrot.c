@@ -1,3 +1,5 @@
+// Number of cores: 4
+
 /*
   This program is an adaptation of the Mandelbrot program
   from the Programming Rosetta Stone, see
@@ -35,6 +37,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
+#include <string.h>
 
 int main(int argc, char *argv[])
 {
@@ -80,6 +83,12 @@ int main(int argc, char *argv[])
   int i, j;    /* Pixel counters */
   int k;       /* Iteration counter */
 
+  unsigned char *buffer;
+  buffer = (char *)malloc(xres * yres * 6 * sizeof(unsigned char));
+  // buffer[xres][yres] = malloc(6);
+  printf("buffer size: %ld\n", sizeof(buffer));
+  int index = 0;
+
   for (j = 0; j < yres; j++)
   {
     y = ymax - j * dy;
@@ -103,7 +112,7 @@ int main(int argc, char *argv[])
       {
         /* interior */
         const unsigned char black[] = {0, 0, 0, 0, 0, 0};
-        fwrite(black, 6, 1, fp);
+        memcpy(buffer + (i * 6) + (j * xres * 6), black, 6);
       }
       else
       {
@@ -115,10 +124,15 @@ int main(int argc, char *argv[])
         color[3] = k & 255;
         color[4] = k >> 8;
         color[5] = k & 255;
-        fwrite(color, 6, 1, fp);
+        memcpy(buffer + (i * 6) + (j * xres * 6), color, 6);
       };
     }
   }
+
+  printf("buffer size: %ld\n", sizeof(buffer));
+  fwrite(buffer, sizeof(char), xres * yres * 6 * sizeof(unsigned char), fp);
   fclose(fp);
+  free(buffer);
+
   return 0;
 }
