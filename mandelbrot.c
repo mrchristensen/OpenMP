@@ -19,7 +19,7 @@
   gcc -o mandelbrot -O4 mandelbrot.c
 
   Usage:
- 
+
   ./mandelbrot <xmin> <xmax> <ymin> <ymax> <maxiter> <xres> <out.ppm>
 
   Example:
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   unsigned char *buffer;
   buffer = (char *)malloc(xres * yres * 6 * sizeof(unsigned char));
   // buffer[xres][yres] = malloc(6);
-  
+
   printf("Start time\n");
   start = omp_get_wtime();
 
